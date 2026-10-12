@@ -58,3 +58,13 @@ export async function updatePersonne(
 
   return response.json()
 }
+
+export async function deletePersonne(id: number): Promise<void> {
+  const response = await fetch(`/api/personnes/${id}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la suppression de la personne')
+  }
+}

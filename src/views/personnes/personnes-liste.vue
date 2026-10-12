@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { PersonneResponse as Personne } from '@/models/personnes/personne'
+import { deletePersonne, getPersonnes } from '@/services/personne-service'
+import { Trash2 } from '@lucide/vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { PersonneResponse as Personne } from '@/models/personnes/personne'
-import { getPersonnes } from '@/services/personne-service'
-
 const router = useRouter()
 
 const personnes = ref<Personne[]>([])
@@ -33,6 +33,18 @@ function consulterPersonne(id: number) {
 function ajouterPersonne() {
   router.push({ name: 'personne-create' })
 }
+
+function supprimerPersonne(id: number) {
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette personne ?')) {
+    deletePersonne(id)
+      .then(() => {
+        personnes.value = personnes.value.filter((p) => p.id !== id)
+      })
+      .catch(() => {
+        error.value = 'Erreur lors de la suppression de la personne.'
+      })
+  }
+}
 </script>
 
 <template>
@@ -52,6 +64,15 @@ function ajouterPersonne() {
         <li v-for="personne in personnes" :key="personne.id">
           <button type="button" class="personne-item" @click="consulterPersonne(personne.id)">
             {{ personne.prenom }} {{ personne.nom }}
+          </button>
+          <button
+            type="button"
+            class="delete-button"
+            aria-label="Supprimer la personne"
+            title="Supprimer"
+            @click="supprimerPersonne(personne.id)"
+          >
+            <Trash2 :size="18" />
           </button>
         </li>
       </ul>
@@ -73,5 +94,18 @@ function ajouterPersonne() {
 
 .personne-item:hover {
   text-decoration: underline;
+}
+
+.delete-button {
+  color: #dc3545;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.delete-button:hover {
+  background-color: #fce8e8;
 }
 </style>
